@@ -6,7 +6,7 @@
 /*   By: yudedele <yudedele@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/25 17:53:11 by yudedele          #+#    #+#             */
-/*   Updated: 2025/08/25 17:53:12 by yudedele         ###   ########.fr       */
+/*   Updated: 2025/08/27 16:32:12 by yudedele         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,5 @@
 char	*gn_strjoin(char *s1, char *s2);
 char	*gn_chr(const char *s, int c);
 size_t	gn_len(const char *s);
-char	*gn_get_line(char *s1);
-char	*gn_get_remaining(char *s1);
 char	*get_next_line(int fd);
 #endif

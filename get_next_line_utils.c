@@ -6,7 +6,7 @@
 /*   By: yudedele <yudedele@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/25 17:53:03 by yudedele          #+#    #+#             */
-/*   Updated: 2025/08/25 17:53:04 by yudedele         ###   ########.fr       */
+/*   Updated: 2025/08/27 15:17:14 by yudedele         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,8 +58,6 @@ char	*gn_strjoin(char *s1, char *s2)
 			return (NULL);
 		s1[0] = '\0';
 	}
-	if (!s2)
-		return (NULL);
 	res = malloc(gn_len(s1) + gn_len(s2) + 1);
 	if (!res)
 		return (NULL);

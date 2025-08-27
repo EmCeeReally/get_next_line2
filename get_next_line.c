@@ -6,26 +6,20 @@
 /*   By: yudedele <yudedele@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/25 17:53:05 by yudedele          #+#    #+#             */
-/*   Updated: 2025/08/25 17:53:06 by yudedele         ###   ########.fr       */
+/*   Updated: 2025/08/27 16:39:38 by yudedele         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-static void	*ft_return(void *p1, void *p2, void *p3, void *p4)
+static void	*ft_return(void *p1)
 {
 	if (p1)
 		free(p1);
-	if (p2)
-		free(p2);
-	if (p3)
-		free(p3);
-	if (p4)
-		free(p4);
 	return (NULL);
 }
 
-char	*gn_get_line(char *s1)
+static char	*gn_get_line(char *s1)
 {
 	char	*line;
 	int		i;
@@ -52,7 +46,7 @@ char	*gn_get_line(char *s1)
 	return (line);
 }
 
-char	*gn_get_remaining(char *s1)
+static char	*gn_get_remaining(char *s1)
 {
 	char	*remaining;
 	int		i;
@@ -63,11 +57,17 @@ char	*gn_get_remaining(char *s1)
 	while (s1[i] && s1[i] != '\n')
 		i++;
 	if (!s1[i])
-		return (ft_return(s1, NULL, NULL, NULL));
+	{
+		free(s1);
+		return (NULL);
+	}
 	i++;
 	remaining = malloc(gn_len(s1) - i + 1);
 	if (!remaining)
-		return (ft_return(s1, NULL, NULL, NULL));
+	{
+		free(s1);
+		return (NULL);
+	}
 	while (s1[i])
 		remaining[j++] = s1[i++];
 	remaining[j] = '\0';
@@ -88,11 +88,15 @@ static char	*read_and_join(int fd, char *s1)
 	{
 		b_read = read(fd, buffer, BUFFER_SIZE);
 		if (b_read < 0)
-			return (ft_return(s1, buffer, NULL, NULL));
+		{
+			free(s1);
+			free(buffer);
+			return (NULL);
+		}
 		buffer[b_read] = '\0';
 		s1 = gn_strjoin(s1, buffer);
 		if (!s1)
-			return (ft_return(buffer, NULL, NULL, NULL));
+			return (ft_return(buffer));
 	}
 	free(buffer);
 	return (s1);
@@ -107,8 +111,22 @@ char	*get_next_line(int fd)
 		return (NULL);
 	s1 = read_and_join(fd, s1);
 	if (!s1 || s1[0] == '\0')
-		return (free(s1), s1 = NULL, NULL);
+	{
+		free(s1);
+		s1 = NULL;
+		return (NULL);
+	}
 	line = gn_get_line(s1);
 	s1 = gn_get_remaining(s1);
 	return (line);
+}
+#include <fcntl.h>
+#include <stdio.h> 
+int main()
+{
+	int fd = open("test.txt",O_RDONLY);
+	char *line = get_next_line(fd);
+	printf("%s",line);
+	free(line);
+	close(fd);
 }
