@@ -6,18 +6,12 @@
 /*   By: yudedele <yudedele@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/25 17:53:05 by yudedele          #+#    #+#             */
-/*   Updated: 2025/08/27 16:39:38 by yudedele         ###   ########.fr       */
+/*   Updated: 2025/08/29 23:49:34 by yudedele         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
-
-static void	*ft_return(void *p1)
-{
-	if (p1)
-		free(p1);
-	return (NULL);
-}
+#include <stdlib.h>
 
 static char	*gn_get_line(char *s1)
 {
@@ -34,16 +28,17 @@ static char	*gn_get_line(char *s1)
 	line = malloc(i + 1);
 	if (!line)
 		return (NULL);
-	i = -1;
-	while (s1[++i] && s1[i] != '\n')
-		line[i] = s1[i];
-	if (s1[i] == '\n')
+	i = 0;
+	while (s1[i] && s1[i] != '\n')
 	{
 		line[i] = s1[i];
 		i++;
 	}
-	line[i] = '\0';
-	return (line);
+	if (s1[i] == '\n')
+        line[i++] = '\n';
+    line[i] = '\0';
+
+    return line;
 }
 
 static char	*gn_get_remaining(char *s1)
@@ -62,7 +57,7 @@ static char	*gn_get_remaining(char *s1)
 		return (NULL);
 	}
 	i++;
-	remaining = malloc(gn_len(s1) - i + 1);
+	remaining = malloc(gn_strlen(s1) - i + 1);
 	if (!remaining)
 	{
 		free(s1);
@@ -75,57 +70,53 @@ static char	*gn_get_remaining(char *s1)
 	return (remaining);
 }
 
-static char	*read_and_join(int fd, char *s1)
+static char	*read_and_join(int fd, char *s1)//emrecan n
 {
-	char	*buffer;
-	int		b_read;
+	char	*tmp;
+	int		a;
 
-	buffer = malloc(BUFFER_SIZE + 1);
-	if (!buffer)
-		return (NULL);
-	b_read = 1;
-	while (!gn_chr(s1, '\n') && b_read != 0)
+	a = 1;
+	while (!gn_strchr(s1, '\n') && a != 0)
 	{
-		b_read = read(fd, buffer, BUFFER_SIZE);
-		if (b_read < 0)
-		{
-			free(s1);
-			free(buffer);
+		tmp = malloc(BUFFER_SIZE + 1);
+		if (!tmp)
 			return (NULL);
+		a = read(fd, tmp, BUFFER_SIZE);
+		if (a == -1)
+		{
+			free(tmp);
+			free(s1);
+			return(NULL);
 		}
-		buffer[b_read] = '\0';
-		s1 = gn_strjoin(s1, buffer);
-		if (!s1)
-			return (ft_return(buffer));
+		tmp[a] = '\0';
+		s1 = gn_strjoin(s1, tmp);
+		free(tmp);
 	}
-	free(buffer);
 	return (s1);
 }
 
-char	*get_next_line(int fd)
+char	*get_next_line(int fd)//emrecan n
 {
-	static char	*s1;
-	char		*line;
+	static char	*s1 = NULL;
+	char		*line ;
 
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
 	s1 = read_and_join(fd, s1);
-	if (!s1 || s1[0] == '\0')
-	{
-		free(s1);
-		s1 = NULL;
-		return (NULL);
-	}
+	if(!s1)
+		return(NULL);
 	line = gn_get_line(s1);
 	s1 = gn_get_remaining(s1);
-	return (line);
+	return(line);
 }
+#include <stdio.h>
 #include <fcntl.h>
-#include <stdio.h> 
 int main()
 {
-	int fd = open("test.txt",O_RDONLY);
-	char *line = get_next_line(fd);
+	int fd; 
+	char *line;
+	fd = open("test.txt",O_RDONLY);
+	line = get_next_line(fd);
 	printf("%s",line);
 	free(line);
 	close(fd);
